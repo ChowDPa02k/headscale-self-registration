@@ -84,7 +84,7 @@ This project helps users who want to connect to your Headscale server to self-co
 You can start the application directly using Waitress:
 
 ```bash
-python waitress_server.py
+python serve.py
 ```
 
 By default, the server will listen on `0.0.0.0:5000`. You can customize the host, port, and thread count using environment variables:
@@ -111,13 +111,13 @@ python waitress_server.py
 2. Start the application with PM2:
 
    ```bash
-   pm2 start waitress_server.py --name headscale-self-reg --interpreter=/path/to/python
+   pm2 start serve.py --name headscale-self-reg --interpreter=/path/to/python
    ```
 
    For example, if using Miniconda:
 
    ```bash
-   pm2 start waitress_server.py --name headscale-self-reg --interpreter=/opt/miniconda3/bin/python
+   pm2 start serve.py --name headscale-self-reg --interpreter=/opt/miniconda3/bin/python
    ```
 
 3. Set PM2 to start on boot:
@@ -147,7 +147,7 @@ python waitress_server.py
    Group=your_group
    WorkingDirectory=/path/to/headscale-self-register
    Environment="PATH=/path/to/your/python/venv/bin"
-   ExecStart=/path/to/your/python/venv/bin/python waitress_server.py
+   ExecStart=/path/to/your/python/venv/bin/python serve.py
    Restart=always
    RestartSec=5
    StartLimitIntervalSec=0
