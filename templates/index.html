@@ -1,0 +1,170 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Self-Service Registration</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            max-width: 600px;
+            margin: 0 auto;
+            padding: 20px;
+        }
+        .form-group {
+            margin-bottom: 15px;
+        }
+        label {
+            display: block;
+            /* margin-bottom: 15px; */
+        }
+        #subtitle {
+            margin-bottom: 0.5em;
+        }
+        input[type="text"], select, input[type="radio"] {
+            margin: 0 4px;
+        }
+        input[type="text"], select {
+            width: 100%;
+            padding: 8px;
+            box-sizing: border-box;
+        }
+        button {
+            background-color: #4CAF50;
+            color: white;
+            padding: 10px 15px;
+            border: none;
+            cursor: pointer;
+        }
+        .result {
+            margin-top: 20px;
+            padding: 10px;
+            background-color: #f5f5f5;
+            border: 1px solid #ddd;
+            white-space: pre-wrap;
+            font-family: monospace;
+        }
+        .user-option {
+            display: flex;
+            align-items: center;
+            height: 1.5em;
+        }
+        .user-option label {
+            margin-left: 5px;
+            display: inline;
+        }
+        .new-user-input {
+            margin-top: 10px;
+            display: none;
+        }
+        #user_input {
+            margin-top: 5px;
+        }
+        .note {
+        position: relative;
+        padding: 1rem 1.5rem;
+        margin: 1.5rem 0;
+        border-left: 4px solid;
+        border-radius: 4px;
+        background: rgba(255, 165, 0, 0.1); /* 橙色基础背景 */
+        color: #333;
+        }
+        .note.orange {
+        border-color: #FFA500;
+        background: rgba(255, 165, 0, 0.08);
+        }
+        .note.yellow {
+        border-color: #FFD700;
+        background: rgba(255, 215, 0, 0.1);
+        }
+        @media (max-width: 768px) {
+        .note {
+            padding: 1rem;
+            margin: 1rem 0;
+        }
+        .note::before {
+            left: -1.5em;
+        }
+        }
+    </style>
+    <script>
+        function toggleNewUserInput() {
+            var newUserRadio = document.getElementById('new_user_radio');
+            var userInput = document.getElementById('user_input_container');
+            
+            if (newUserRadio.checked) {
+                userInput.style.display = 'block';
+            } else {
+                userInput.style.display = 'none';
+            }
+        }
+        
+        function validateForm() {
+            var newUserRadio = document.getElementById('new_user_radio');
+            var userInput = document.getElementById('user_input');
+            
+            if (newUserRadio.checked && userInput.value.trim() === '') {
+                alert('Please input a valid user name!');
+                return false;
+            }
+            return true;
+        }
+    </script>
+</head>
+<body>
+    <h1>Headscale Node Registration</h1>
+    
+    <form method="POST" action="/register" onsubmit="return validateForm()">
+        <div class="form-group">
+            <label for="node_id" id="subtitle">Node ID:</label>
+            <input type="text" id="node_id" name="node_id" required>
+        </div>
+
+        <div class="note orange">
+            <p>⚠️ <strong>Important Notes:</strong></p>
+            <p>If you don't have a large number of devices (more than 3) that need to join the Tailnet, just select "default".</p>
+            <p>When creating a new user, avoid using a username related to your real name, as it will be visible to everyone.</p>
+        </div>
+
+        <div class="form-group">
+            <label id="subtitle">User:</label>
+            
+            <!-- 现有用户选项 -->
+            {% for user in users %}
+            <div class="user-option">
+                <input type="radio" id="user_{{ user }}" name="user_selection" value="existing" 
+                       onclick="document.getElementById('user_type').value='{{ user }}'; toggleNewUserInput();" 
+                       {% if loop.index == 1 %}checked{% endif %}>
+                <label for="user_{{ user }}">{{ user }}</label>
+            </div>
+            {% endfor %}
+            
+            <!-- 新用户选项 -->
+            <div class="user-option" style="margin-top: 0.5em;">
+                <input type="radio" id="new_user_radio" name="user_selection" value="new" onclick="toggleNewUserInput();">
+                <label for="new_user_radio">Create New User</label>
+            </div>
+            
+            <!-- 新用户输入框 -->
+            <div id="user_input_container" class="new-user-input">
+                <label for="user_input">New user name:</label>
+                <input type="text" id="user_input" placeholder="New user name">
+            </div>
+            
+            <!-- 隐藏字段用于提交最终选择的用户 -->
+            <input type="hidden" id="user_type" name="user_type" value="{{ users[0] if users else '' }}">
+        </div>
+        
+        <button type="submit">Register</button>
+    </form>
+    
+    {% if result %}
+    <div class="result"><h3 style="margin-block-start:0; font-size: 2em;">Result:</h3>{{ result }}</div>
+    {% endif %}
+    
+    <script>
+        // 当选择"新用户"时更新隐藏的user_type字段
+        document.getElementById('user_input').addEventListener('input', function() {
+            document.getElementById('user_type').value = this.value;
+        });
+    </script>
+</body>
+</html>
