@@ -190,7 +190,3 @@ Application logs are stored in the `logs` directory:
 
 - `logs/headscale_app.log` - Application logs
 - `logs/waitress.log` - Server logs
-
-## License
-
-[MIT License](https://claude.ai/chat/LICENSE)
