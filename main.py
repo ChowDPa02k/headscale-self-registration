@@ -99,7 +99,7 @@ def register():
         else:
             result += f"Success: {output}\n"
             # 更新用户列表
-            get_headscale_users
+            get_headscale_users()
             # user_names = [user['name'] for user in users] if users else ['default']
     
     try:
