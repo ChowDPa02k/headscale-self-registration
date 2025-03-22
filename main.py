@@ -9,8 +9,6 @@ from logging.handlers import RotatingFileHandler
 app = Flask(__name__)
 app.secret_key = secrets.token_hex(16)
 
-user_list_file = '/root/headscale_users.json'
-
 if not os.path.exists('logs'):
     os.mkdir('logs')
 file_handler = RotatingFileHandler('logs/headscale_app.log', maxBytes=10240, backupCount=10)
@@ -31,15 +29,21 @@ def get_headscale_users(src='headscale'):
             output = subprocess.run(['headscale', 'user', 'list', '-ojson'], 
                                 capture_output=True, text=True, check=True)
             users = json.loads(output.stdout)
-            with open(user_list_file, 'w') as f:
-                f.write(output.stdout)
+            
+            if users is not None:
+                temp_file = '/root/headscale_users.json.tmp'
+                with open(temp_file, 'w') as f:
+                    f.write(output.stdout)
+                
+                if os.path.exists(temp_file) and os.path.getsize(temp_file) > 0:
+                    os.replace(temp_file, '/root/headscale_users.json')
             ret = users
         except Exception as e:
             app.logger.error(f"Failed to get users: {e.__class__.__name__} {str(e)}")
 
     if src == 'file':
         try:
-            with open(user_list_file, 'r') as f:
+            with open('/root/headscale_users.json', 'r') as f:
                 users = json.load(f)
                 ret = users
         except Exception as e:
@@ -63,6 +67,8 @@ def create_user(username):
 def index():
     # 获取用户列表
     users = get_headscale_users(src='file')
+    if not users:
+        users = get_headscale_users()
     user_names = [user['name'] for user in users] if users else ['default']
     
     # 从会话中获取结果（如果有）
@@ -75,6 +81,8 @@ def register():
     result = ""
     
     users = get_headscale_users(src='file')
+    if not users:
+        users = get_headscale_users()
     user_names = [user['name'] for user in users] if users else ['default']
 
     node_id = request.form.get('node_id')
