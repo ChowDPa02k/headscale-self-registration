@@ -1,0 +1,203 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Jellyfin Registration</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            max-width: 600px;
+            margin: 0 auto;
+            padding: 20px;
+        }
+        .form-group {
+            margin-bottom: 15px;
+        }
+        label {
+            display: block;
+            margin-bottom: 5px;
+        }
+        #subtitle {
+            margin-bottom: 0.5em;
+        }
+        input[type="text"], 
+        input[type="password"], 
+        select {
+            width: 100%;
+            padding: 8px;
+            box-sizing: border-box;
+            margin-bottom: 10px;
+        }
+        .checkbox-group {
+            margin-bottom: 10px;
+        }
+        .checkbox-option {
+            display: flex;
+            align-items: center;
+            margin-bottom: 8px;
+        }
+        .checkbox-option input[type="checkbox"] {
+            margin-right: 8px;
+        }
+        .checkbox-option label {
+            display: inline;
+            margin-bottom: 0;
+        }
+        .nested-option {
+            margin-left: 25px;
+            display: none;
+        }
+        button {
+            background-color: #00a4dc; /* Jellyfin blue */
+            color: white;
+            padding: 10px 15px;
+            border: none;
+            cursor: pointer;
+            border-radius: 4px;
+        }
+        button:hover {
+            background-color: #0082b0;
+        }
+        .result {
+            margin-top: 20px;
+            padding: 10px;
+            background-color: #f5f5f5;
+            border: 1px solid #ddd;
+            white-space: pre-wrap;
+            font-family: monospace;
+        }
+        .note {
+            position: relative;
+            padding: 1rem 1.5rem;
+            margin: 1.5rem 0;
+            border-left: 4px solid;
+            border-radius: 4px;
+            background: rgba(0, 164, 220, 0.1); /* Jellyfin blue background */
+            color: #333;
+        }
+        .note.blue {
+            border-color: #00a4dc;
+        }
+        .note.orange {
+            border-color: #FFA500;
+            background: rgba(255, 165, 0, 0.08);
+        }
+        @media (prefers-color-scheme: light) {
+            .tslogo{
+                height: 4em;
+                width: 4em;
+                background-image: url('/static/Tailscale-Mark-Black.svg');
+                background-position: center;
+                background-size: contain;
+            }
+        }
+        @media (prefers-color-scheme: dark) {
+            .tslogo{
+                height: 4em;
+                width: 4em;
+                background-image: url('/static/Tailscale-Mark-White.svg');
+                background-position: center;
+                background-size: contain;
+            }
+        }
+        .jflogo {
+            height: 2.25em;
+            width: 2.25em;
+            background-image: url('/static/Jellyfin-icon.svg');
+            background-position: center;
+            background-size: contain;     
+            margin-right: 1em;   
+        }
+        .titleBar {
+            display: flex;
+            flex-direction: row;
+            width: 100%;
+            flex-wrap: nowrap;
+            justify-content: space-between;
+            align-items: center;
+        }
+    </style>
+    <script>
+        function toggleNsfwContinue() {
+            var allowNsfw = document.getElementById('allow_nsfw');
+            var nsfwContinue = document.getElementById('nsfw_continue_container');
+            
+            if (allowNsfw.checked) {
+                nsfwContinue.style.display = 'flex';
+            } else {
+                nsfwContinue.style.display = 'none';
+                document.getElementById('allow_nsfw_continue').checked = false;
+            }
+        }
+        
+        function validateForm() {
+            var username = document.getElementById('username').value.trim();
+            var password = document.getElementById('password').value.trim();
+            
+            if (username === '') {
+                alert('Please enter a username!');
+                return false;
+            }
+            
+            if (password === '') {
+                alert('Please enter a password!');
+                return false;
+            }
+            
+            return true;
+        }
+    </script>
+</head>
+<body>
+    <div class="titleBar">
+        <h1>Jellyfin Registration</h1>
+        <a href="../"><div class="jflogo"></div></a>
+    </div>
+    
+    <div class="note blue">
+        <p>⚠️ <strong>Important Notes:</strong></p>
+        <p>To avoid social embarrassment, please exercise caution when enabling the "Show NSFW content on homepage" option!</p>
+    </div>
+    
+    <form method="POST" action="/jellyfin/register" onsubmit="return validateForm()">
+        <div class="form-group">
+            <label for="username">Username:</label>
+            <input type="text" id="username" name="username" required>
+        </div>
+        
+        <div class="form-group">
+            <label for="password">Password:</label>
+            <input type="text" id="password" name="password" required>
+        </div>
+        
+        <div class="form-group">
+            <div class="checkbox-group">
+                <div class="checkbox-option">
+                    <input type="checkbox" id="allow_nsfw" name="allow_nsfw" onchange="toggleNsfwContinue()">
+                    <label for="allow_nsfw">Allow NSFW</label>
+                </div>
+                
+                <div id="nsfw_continue_container" class="checkbox-option nested-option">
+                    <input type="checkbox" id="allow_nsfw_continue" name="allow_nsfw_continue">
+                    <label for="allow_nsfw_continue">Show NSFW content on Homepage</label>
+                </div>
+                
+                <div class="checkbox-option">
+                    <input type="checkbox" id="need_transcoding" name="need_transcoding">
+                    <label for="need_transcoding">Need Transcoding</label>
+                </div>
+                
+                <div class="checkbox-option">
+                    <input type="checkbox" id="need_downloading" name="need_downloading">
+                    <label for="need_downloading">Need Downloading</label>
+                </div>
+            </div>
+        </div>
+        
+        <button type="submit">Register</button>
+    </form>
+    
+    {% if result %}
+    <div class="result"><h3 style="margin-block-start:0; font-size: 1.5em;">Result:</h3>{{ result }}</div>
+    {% endif %}
+</body>
+</html>

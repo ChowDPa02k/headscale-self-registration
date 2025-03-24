@@ -76,13 +76,47 @@
         background: rgba(255, 215, 0, 0.1);
         }
         @media (max-width: 768px) {
-        .note {
-            padding: 1rem;
-            margin: 1rem 0;
+            .note {
+                padding: 1rem;
+                margin: 1rem 0;
+            }
+            .note::before {
+                left: -1.5em;
+            }
         }
-        .note::before {
-            left: -1.5em;
+        @media (prefers-color-scheme: light) {
+            .tslogo{
+                height: 4em;
+                width: 4em;
+                background-image: url('/static/Tailscale-Mark-Black.svg');
+                background-position: center;
+                background-size: contain;
+            }
         }
+        @media (prefers-color-scheme: dark) {
+            .tslogo{
+                height: 4em;
+                width: 4em;
+                background-image: url('/static/Tailscale-Mark-White.svg');
+                background-position: center;
+                background-size: contain;
+            }
+        }
+        .jflogo {
+            height: 2.25em;
+            width: 2.25em;
+            background-image: url('/static/Jellyfin-icon.svg');
+            background-position: center;
+            background-size: contain;     
+            margin-right: 1em;   
+        }
+        .titleBar {
+            display: flex;
+            flex-direction: row;
+            width: 100%;
+            flex-wrap: nowrap;
+            justify-content: space-between;
+            align-items: center;
         }
     </style>
     <script>
@@ -110,8 +144,11 @@
     </script>
 </head>
 <body>
-    <h1>Headscale Node Registration</h1>
-    
+    <div class="titleBar">
+        <h1>Headscale Node Registration</h1>
+        <a href="/jellyfin"><div class="tslogo"></div></a>
+    </div>
+
     <form method="POST" action="/register" onsubmit="return validateForm()">
         <div class="form-group">
             <label for="node_id" id="subtitle">Node ID:</label>
