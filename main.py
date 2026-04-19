@@ -3,6 +3,7 @@ import subprocess
 import json
 import secrets
 import os
+import re
 import logging
 from logging.handlers import RotatingFileHandler
 from jellyfin import *
@@ -21,6 +22,8 @@ file_handler.setLevel(logging.INFO)
 app.logger.addHandler(file_handler)
 app.logger.setLevel(logging.INFO)
 app.logger.info('App starting...')
+
+REGISTRATION_ID_RE = re.compile(r'^[A-Za-z0-9_-]{24}$')
 
 def get_headscale_users(src='headscale'):
     """获取headscale用户列表"""
@@ -87,10 +90,19 @@ def register():
         users = get_headscale_users()
     user_names = [user['name'] for user in users] if users else ['default']
 
-    node_id = request.form.get('node_id')
+    registration_id = (request.form.get('registration_id') or '').strip()
     user_type = request.form.get('user_type')
-    app.logger.info(f"Received request: Node ID={node_id}, User={user_type}")
-    
+    app.logger.info(f"Received request: Registration ID={registration_id}, User={user_type}")
+
+    if not REGISTRATION_ID_RE.fullmatch(registration_id):
+        result = (
+            'Failed: invalid registration ID. '
+            'Headscale v0.28 expects a 24-character registration ID made of letters, digits, "_" or "-".'
+        )
+        app.logger.warning(result)
+        session['result'] = result
+        return redirect(url_for('index'))
+
     if user_type not in user_names:
         success, output = create_user(user_type)
         if not success:
@@ -105,7 +117,7 @@ def register():
             # user_names = [user['name'] for user in users] if users else ['default']
     
     try:
-        cmd = ['headscale', 'nodes', 'register', '--user', user_type, '--key', node_id]
+        cmd = ['headscale', 'nodes', 'register', '--user', user_type, '--key', registration_id]
         output = subprocess.run(cmd, capture_output=True, text=True)
         
         if output.returncode == 0:
