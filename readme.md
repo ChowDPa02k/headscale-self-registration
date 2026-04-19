@@ -10,7 +10,7 @@ A simple web application that allows users to self-register their nodes to a Hea
 
 ## Introduction
 
-This project helps users who want to connect to your Headscale server to self-complete the verification process. It provides a web interface where users can input their Node ID and select or create a user namespace in Headscale.
+This project helps users who want to connect to your Headscale server to self-complete the verification process. It provides a web interface where users can input their registration ID and select or create a user namespace in Headscale.
 
 ![image-20250320154223214](https://geelao-oss.oss-cn-hangzhou.aliyuncs.com/db/202503201542305.png?x-oss-process=style/jpeg)
 
@@ -40,15 +40,22 @@ This project helps users who want to connect to your Headscale server to self-co
    tailscale login --login-server https://your-headscale-server
    ```
 
-2. You will receive a Node ID (also called a machine key)
+2. You will receive a registration ID
 
 3. Open the self-registration website URL provided by the Headscale administrator
 
-4. Enter your Node ID in the form field
+4. Enter your registration ID in the form field
 
 5. Select an existing user namespace or create a new one
 
 6. Click "Register" button
+
+Notes for Headscale v0.28 and newer:
+
+- The registration form expects a 24-character registration ID.
+- Registration IDs are case-sensitive and may contain letters, digits, `_`, and `-`.
+- Do not paste a `nodekey:...`, machine key, or any other public key.
+- The backend validates the registration ID before calling `headscale nodes register`.
 
 7. Check the result:
 

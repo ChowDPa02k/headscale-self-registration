@@ -98,8 +98,15 @@
         }
         
         function validateForm() {
+            var registrationInput = document.getElementById('registration_id');
             var newUserRadio = document.getElementById('new_user_radio');
             var userInput = document.getElementById('user_input');
+            var registrationId = registrationInput.value.trim();
+
+            if (!/^[A-Za-z0-9_-]{24}$/.test(registrationId)) {
+                alert('Please input a valid 24-character registration ID.');
+                return false;
+            }
             
             if (newUserRadio.checked && userInput.value.trim() === '') {
                 alert('Please input a valid user name!');
@@ -114,8 +121,14 @@
     
     <form method="POST" action="/register" onsubmit="return validateForm()">
         <div class="form-group">
-            <label for="node_id" id="subtitle">Node ID:</label>
-            <input type="text" id="node_id" name="node_id" required>
+            <label for="registration_id" id="subtitle">Registration ID:</label>
+            <input type="text" id="registration_id" name="registration_id" placeholder="24-character registration ID" required>
+        </div>
+
+        <div class="note yellow">
+            <p>Headscale v0.28 requires a 24-character registration ID.</p>
+            <p>Valid characters are letters, digits, <code>_</code>, and <code>-</code>.</p>
+            <p>Do not paste a <code>nodekey:</code>, machine key, or public key here.</p>
         </div>
 
         <div class="note orange">
